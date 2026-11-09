@@ -98,7 +98,9 @@ begin
 
         case state is
             when IDLE =>
-                null;
+                sclk_control <= '1'; -- CPOL=1: SCLK rests high in mode 3.
+                cs_n_control <= '1';
+                busy_control <= '0';
 
             when PREPARE =>
                 cs_n_control <= '0';

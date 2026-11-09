@@ -69,6 +69,15 @@ begin
         reset_n <= '1';
         wait until rising_edge(clk);
 
+        -- IDLE must keep mode-3 clock and control outputs at rest until start.
+        for idle_cycle in 1 to 3 loop
+            wait until rising_edge(clk);
+            wait for 1 ns;
+            assert sclk = '1' and cs_n = '1' and busy = '0'
+                report "IDLE after reset must hold SCLK high, CS inactive, and busy low"
+                severity failure;
+        end loop;
+
         -- Transaction 1: also pulse start_tx while busy to verify it is ignored.
         tx_byte := x"A5";
         rx_byte := x"3C";
@@ -116,9 +125,13 @@ begin
             report "Transaction 1 must finish with busy low, CS inactive, and SCLK high" severity failure;
         assert data_out = rx_byte
             report "Transaction 1 received an incorrect byte" severity failure;
-        wait until rising_edge(clk);
-        assert busy = '0' and cs_n = '1'
-            report "A start pulse while busy must not queue another transaction" severity failure;
+        for idle_cycle in 1 to 3 loop
+            wait until rising_edge(clk);
+            wait for 1 ns;
+            assert busy = '0' and cs_n = '1' and sclk = '1'
+                report "After completion, IDLE must remain at its mode-3 levels until a new start"
+                severity failure;
+        end loop;
 
         -- Transaction 2: distinct patterns verify shifting and data_out retention.
         tx_byte := x"96";
