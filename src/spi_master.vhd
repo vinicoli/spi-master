@@ -20,7 +20,6 @@ architecture rtl of spi_master is
     type state_t is (IDLE, PREPARE, SCLK_FALL, SCLK_RISE);
 
     signal state         : state_t := IDLE;
-    signal next_state    : state_t := IDLE;
     signal tx_shift      : std_logic_vector(7 downto 0) := (others => '0');
     signal rx_shift      : std_logic_vector(7 downto 0) := (others => '0');
     signal data_out_reg  : std_logic_vector(7 downto 0) := (others => '0');
@@ -44,70 +43,81 @@ begin
             data_out_reg <= (others => '0');
             bit_count    <= 0;
         elsif rising_edge(clk) then
-            state <= next_state;
-
             case state is
                 when IDLE =>
                     if start_tx = '1' then
+                        state     <= PREPARE;
                         tx_shift  <= data_in;
                         rx_shift  <= (others => '0');
                         bit_count <= 0;
                     end if;
 
                 when PREPARE =>
-                    null;
+                    state <= SCLK_FALL;
 
                 when SCLK_FALL =>
-                    -- MISO is sampled as the FSM leaves SCLK_FALL and
-                    -- enters SCLK_RISE (the mode-3 trailing edge).
+                    -- MISO is sampled as the FSM leaves SCLK_FALL; the
+                    -- Moore decode raises SCLK in the destination state.
                     rx_shift <= rx_shift(6 downto 0) & miso;
                     if bit_count = 7 then
                         data_out_reg <= rx_shift(6 downto 0) & miso;
+                        state        <= IDLE;
+                    else
+                        state <= SCLK_RISE;
                     end if;
 
                 when SCLK_RISE =>
                     if bit_count < 7 then
                         tx_shift  <= tx_shift(6 downto 0) & '0';
                         bit_count <= bit_count + 1;
+                        state     <= SCLK_FALL;
+                    else
+                        -- Defensive recovery for an inconsistent phase/count.
+                        state     <= IDLE;
+                        tx_shift  <= (others => '0');
+                        rx_shift  <= (others => '0');
+                        bit_count <= 0;
                     end if;
+
+                when others =>
+                    -- Abort an invalid state and return the datapath to idle.
+                    state     <= IDLE;
+                    tx_shift  <= (others => '0');
+                    rx_shift  <= (others => '0');
+                    bit_count <= 0;
             end case;
         end if;
     end process p_state_register;
 
-    p_next_state_outputs : process (state, start_tx, bit_count)
+    p_output_logic : process (state)
     begin
-        next_state   <= state;
+        -- Safe Moore defaults are the IDLE output levels.
         sclk_control <= '1';
         cs_n_control <= '1';
         busy_control <= '0';
 
         case state is
             when IDLE =>
-                if start_tx = '1' then
-                    next_state <= PREPARE;
-                end if;
+                null;
 
             when PREPARE =>
-                sclk_control <= '1';
                 cs_n_control <= '0';
                 busy_control <= '1';
-                next_state   <= SCLK_FALL;
 
             when SCLK_FALL =>
                 sclk_control <= '0';
                 cs_n_control <= '0';
                 busy_control <= '1';
-                if bit_count = 7 then
-                    next_state <= IDLE;
-                else
-                    next_state <= SCLK_RISE;
-                end if;
 
             when SCLK_RISE =>
-                sclk_control <= '1';
                 cs_n_control <= '0';
                 busy_control <= '1';
-                next_state   <= SCLK_FALL;
+
+            when others =>
+                -- Keep the external control pins at their idle levels.
+                sclk_control <= '1';
+                cs_n_control <= '1';
+                busy_control <= '0';
         end case;
-    end process p_next_state_outputs;
+    end process p_output_logic;
 end architecture rtl;

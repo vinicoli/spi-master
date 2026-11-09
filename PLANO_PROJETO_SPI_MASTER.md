@@ -31,7 +31,7 @@ Projetar, documentar e simular um mestre SPI full-duplex de 8 bits usando VHDL, 
 
 ## Máquina de estados Moore
 
-O RTL usa dois processos nomeados. `p_state_register` registra o estado e atualiza os registradores do datapath. `p_next_state_outputs` é combinacional: calcula `next_state` e decodifica `sclk`, `cs_n` e `busy` exclusivamente a partir do estado atual. `mosi` vem do registrador de transmissão e `data_out` do registrador de recepção; esses são sinais de dados, não sinais de controle da FSM.
+O RTL usa dois processos nomeados e um único sinal de estado, `state`. `p_state_register` é sequencial: faz as transições diretamente dentro do `case state` e atualiza os registradores do datapath. Não há sinal `next_state`. `p_output_logic` é combinacional, sensível somente a `state`, e decodifica `sclk`, `cs_n` e `busy`. `mosi` vem do registrador de transmissão e `data_out` do registrador de recepção; esses são sinais de dados, não sinais de controle da FSM.
 
 1. **IDLE:** `SCLK=1`, `CS_n=1`, `busy=0`. Aceita `start_tx` e captura o byte de transmissão.
 2. **PREPARE:** `SCLK=1`, `CS_n=0`, `busy=1`. Mantém a seleção ativa antes da primeira borda e apresenta o MSB em `MOSI`.
@@ -39,6 +39,8 @@ O RTL usa dois processos nomeados. `p_state_register` registra o estado e atuali
 4. **SCLK_RISE:** `SCLK=1`, `CS_n=0`, `busy=1`. Para bits não finais, prepara o próximo bit e retorna a `SCLK_FALL`. No oitavo bit, `SCLK_FALL` vai diretamente a `IDLE`: essa transição produz a subida final, captura o último `MISO`, publica a palavra e desativa `CS`/`busy`.
 
 `SCLK_FALL` e `SCLK_RISE` alternam a cada borda de subida de `clk`. O MSB é carregado em `PREPARE`; depois de cada amostra não final, o registrador TX avança um bit para que o próximo valor de `MOSI` acompanhe a descida seguinte. Solicitações de início fora de `IDLE` não alteram a sequência.
+
+Ambos os `case` têm `when others`: o processo sequencial aborta e retorna a `IDLE`, limpando contador e registradores de deslocamento; o processo combinacional mantém níveis externos seguros de repouso (`SCLK` alto, `CS_n` alto e `busy` baixo). Como `state` é enumerado, esse caminho é defensivo e não costuma ser exercitado pela simulação RTL.
 
 ## Diagramas
 

@@ -13,8 +13,8 @@
   <text x="565" y="125" text-anchor="middle" class="label">SPI_MASTER</text>
 
   <rect x="375" y="150" width="380" height="135" rx="12" class="box"/>
-  <text x="565" y="181" text-anchor="middle" class="label">p_next_state_outputs · combinacional</text>
-  <text x="565" y="211" text-anchor="middle" class="small">next_state + decode Moore de SCLK, CS_n e busy</text>
+  <text x="565" y="181" text-anchor="middle" class="label">p_output_logic · combinacional</text>
+  <text x="565" y="211" text-anchor="middle" class="small">Decode Moore de SCLK, CS_n e busy usando state</text>
   <text x="565" y="242" text-anchor="middle" class="small">IDLE · PREPARE · SCLK_FALL · SCLK_RISE</text>
 
   <rect x="375" y="315" width="380" height="150" rx="12" class="box"/>
@@ -23,6 +23,7 @@
   <text x="565" y="409" text-anchor="middle" class="small">Captura MISO na subida; desloca TX entre bits</text>
   <path d="M565 285 V315" class="wire"/>
   <path d="M755 382 H780 V245 H755" class="wire"/>
+  <text x="789" y="322" transform="rotate(-90 789 322)" text-anchor="middle" class="small">state</text>
 
   <text x="55" y="177" class="label">Entradas</text>
   <text x="55" y="215" class="small">clk · reset_n · start_tx</text>

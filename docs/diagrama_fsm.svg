@@ -47,6 +47,6 @@
   <text x="470" y="473" text-anchor="middle" class="small">bit_count = 7 / amostra último MISO; publica data_out</text>
 
   <rect x="265" y="525" width="650" height="75" rx="12" class="note"/>
-  <text x="590" y="555" text-anchor="middle" class="small">p_next_state_outputs decodifica SCLK, CS_n e busy pelo estado atual.</text>
-  <text x="590" y="580" text-anchor="middle" class="small">MOSI e data_out vêm dos registradores do datapath.</text>
+  <text x="590" y="555" text-anchor="middle" class="small">p_state_register faz transições diretamente com o sinal state.</text>
+  <text x="590" y="580" text-anchor="middle" class="small">p_output_logic decodifica controles; dados ficam no datapath.</text>
 </svg>
