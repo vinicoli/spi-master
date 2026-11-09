@@ -1,16 +1,18 @@
 # Contribuindo com o projeto
 
-## Formato de commit
+## Conventional Commits
 
-Use o formato Conventional Commits:
+Use o formato:
 
 ```text
-<tipo>[escopo opcional][!]: <descrição curta>
+<tipo>[escopo opcional][!]: <emoji> <descrição curta>
 
 [corpo opcional]
 
 [rodapé opcional, por exemplo BREAKING CHANGE: ...]
 ```
+
+O prefixo convencional deve vir primeiro para manter compatibilidade com ferramentas. Coloque o emoji imediatamente depois dos dois-pontos, nunca antes do tipo.
 
 Tipos usados neste projeto:
 
@@ -25,10 +27,10 @@ Tipos usados neste projeto:
 Exemplos:
 
 ```text
-feat: add configurable transfer length
-fix: sample MISO on the mode 3 trailing edge
-refactor: separate Moore state and output processes
-docs: explain the SPI timing diagram
+feat: ✨ add configurable transfer length
+fix: 🐛 sample MISO on the mode 3 trailing edge
+refactor: 🔧 separate Moore state and output processes
+docs: 🌐 explain the SPI timing diagram
 ```
 
 Use `!` no tipo/escopo ou o rodapé `BREAKING CHANGE:` para indicar uma alteração incompatível.
@@ -42,4 +44,4 @@ Use `!` no tipo/escopo ou o rodapé `BREAKING CHANGE:` para indicar uma alteraç
 - Uma alteração incompatível (`!` ou `BREAKING CHANGE:`) incrementa MAJOR.
 - `docs`, `test`, `refactor`, `chore`, `build` e `ci` não incrementam a versão por si só.
 
-Ao preparar uma release, atualize `VERSION`, registre a mudança em um commit Conventional Commit apropriado e crie a tag anotada correspondente. A versão inicial do projeto é `0.1.0`; a tag baseline `v0.1.0` identifica o estado inicial versionado.
+Ao preparar uma release, atualize `VERSION`, registre a mudança em um commit Conventional Commit apropriado e crie a tag anotada correspondente. Não crie tags para commits que não sejam releases e não mova tags existentes. A versão atual é `0.1.0`; `v0.1.0` identifica o baseline inicial do projeto.
