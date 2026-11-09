@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="620" viewBox="0 0 1100 620" role="img" aria-labelledby="title desc">
+  <title id="title">Diagrama de bloco do SPI Master</title>
+  <desc id="desc">Mestre SPI de 8 bits em modo 3 com clock de referência, controle, registradores de deslocamento e interface serial.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 Z" fill="#284b63"/></marker>
+    <style>
+      text{font-family:Segoe UI,Arial,sans-serif;fill:#172b3a}.title{font-size:28px;font-weight:700}.label{font-size:17px;font-weight:600}.small{font-size:14px}.box{fill:#f3f7fa;stroke:#284b63;stroke-width:2}.core{fill:#e6f1f8;stroke:#1d5d83;stroke-width:3}.wire{stroke:#284b63;stroke-width:2;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="1100" height="620" fill="#ffffff"/>
+  <text x="550" y="48" text-anchor="middle" class="title">SPI Master · modo 3 · 8 bits</text>
+  <rect x="330" y="105" width="440" height="410" rx="18" class="core"/>
+  <text x="550" y="140" text-anchor="middle" class="label">SPI_MASTER</text>
+  <rect x="390" y="170" width="320" height="72" rx="10" class="box"/>
+  <text x="550" y="199" text-anchor="middle" class="label">FSM + contador de bordas</text>
+  <text x="550" y="224" text-anchor="middle" class="small">IDLE / TRANSFER · 16 transições SCLK</text>
+  <rect x="375" y="275" width="155" height="92" rx="10" class="box"/>
+  <text x="452" y="307" text-anchor="middle" class="label">TX shift</text>
+  <text x="452" y="333" text-anchor="middle" class="small">data_in[7:0]</text>
+  <rect x="570" y="275" width="155" height="92" rx="10" class="box"/>
+  <text x="647" y="307" text-anchor="middle" class="label">RX shift</text>
+  <text x="647" y="333" text-anchor="middle" class="small">data_out[7:0]</text>
+  <text x="75" y="190" class="label">Entradas paralelas</text>
+  <text x="75" y="227" class="small">clk · reset_n · start_tx</text>
+  <text x="75" y="253" class="small">data_in[7:0]</text>
+  <path d="M225 235 H330" class="wire"/>
+  <text x="75" y="414" class="label">MISO</text>
+  <path d="M125 410 H330" class="wire"/>
+  <text x="850" y="190" class="label">Saídas de controle</text>
+  <text x="850" y="227" class="small">busy · cs_n</text>
+  <path d="M770 220 H830" class="wire"/>
+  <text x="850" y="325" class="label">Saídas seriais</text>
+  <text x="850" y="362" class="small">MOSI · SCLK = clk/2</text>
+  <path d="M770 345 H830" class="wire"/>
+  <text x="850" y="430" class="label">Dado recebido</text>
+  <text x="850" y="466" class="small">data_out[7:0]</text>
+  <path d="M725 320 H805 V455 H830" class="wire"/>
+  <path d="M530 320 H548 V242" stroke="#54758a" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <path d="M570 320 H552 V242" stroke="#54758a" stroke-width="2" fill="none" marker-end="url(#arrow)"/>
+  <text x="550" y="560" text-anchor="middle" class="small">No modo 3: MOSI muda na descida; MISO é amostrado na subida.</text>
+</svg>
