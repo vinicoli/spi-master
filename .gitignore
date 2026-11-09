@@ -1,0 +1,21 @@
+# Quartus II generated files
+db/
+incremental_db/
+output_files/
+*.qws
+*.sof
+*.pof
+*.jic
+*.rbf
+*.qdb
+
+# ModelSim generated files
+work/
+transcript
+vsim.wlf
+*.wlf
+modelsim.ini
+
+# Operating system files
+Thumbs.db
+.DS_Store
