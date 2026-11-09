@@ -1,34 +1,52 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="560" viewBox="0 0 1100 560" role="img" aria-labelledby="title desc">
-  <title id="title">FSM do SPI Master</title>
-  <desc id="desc">Máquina de estados com IDLE e TRANSFER, incluindo início, contagem de dezesseis bordas e conclusão.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="640" viewBox="0 0 1180 640" role="img" aria-labelledby="title desc">
+  <title id="title">FSM Moore do SPI Master</title>
+  <desc id="desc">Máquina de quatro estados; sinais de controle são decodificados pelo estado atual e os bytes pertencem ao datapath.</desc>
   <defs>
     <marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto"><path d="M0,0 L10,4 L0,8 Z" fill="#284b63"/></marker>
     <style>
-      text{font-family:Segoe UI,Arial,sans-serif;fill:#172b3a}.title{font-size:28px;font-weight:700}.state{fill:#e6f1f8;stroke:#1d5d83;stroke-width:3}.small{font-size:15px}.label{font-size:19px;font-weight:700}.arrow{stroke:#284b63;stroke-width:2.5;fill:none;marker-end:url(#arrow)}
+      text{font-family:Segoe UI,Arial,sans-serif;fill:#172b3a}.title{font-size:28px;font-weight:700}.state{fill:#e6f1f8;stroke:#1d5d83;stroke-width:3}.small{font-size:14px}.label{font-size:18px;font-weight:700}.arrow{stroke:#284b63;stroke-width:2.5;fill:none;marker-end:url(#arrow)}.note{fill:#f3f7fa;stroke:#8aa5b5;stroke-width:1.5}
     </style>
   </defs>
-  <rect width="1100" height="560" fill="#fff"/>
-  <text x="550" y="48" text-anchor="middle" class="title">Máquina de estados SPI Master</text>
-  <ellipse cx="155" cy="278" rx="54" ry="35" fill="#fff" stroke="#284b63" stroke-width="2"/>
-  <text x="155" y="284" text-anchor="middle" class="small">reset_n=0</text>
-  <path d="M210 278 H338" class="arrow"/>
-  <text x="270" y="260" text-anchor="middle" class="small">reset liberado</text>
-  <rect x="350" y="205" width="250" height="145" rx="22" class="state"/>
-  <text x="475" y="245" text-anchor="middle" class="label">IDLE</text>
-  <text x="475" y="276" text-anchor="middle" class="small">SCLK=1, CS_n=1</text>
-  <text x="475" y="301" text-anchor="middle" class="small">busy=0</text>
-  <text x="475" y="326" text-anchor="middle" class="small">Aguarda start_tx</text>
-  <rect x="760" y="205" width="285" height="145" rx="22" class="state"/>
-  <text x="902" y="245" text-anchor="middle" class="label">TRANSFER</text>
-  <text x="902" y="276" text-anchor="middle" class="small">16 transições de SCLK</text>
-  <text x="902" y="301" text-anchor="middle" class="small">Descida: avança MOSI</text>
-  <text x="902" y="326" text-anchor="middle" class="small">Subida: amostra MISO</text>
-  <path d="M600 240 C655 160 705 160 760 240" class="arrow"/>
-  <text x="680" y="157" text-anchor="middle" class="small">start_tx=1 / captura data_in,</text>
-  <text x="680" y="178" text-anchor="middle" class="small">CS_n=0, busy=1</text>
-  <path d="M760 320 C700 420 650 420 600 320" class="arrow"/>
-  <text x="680" y="438" text-anchor="middle" class="small">oitava amostra / publica data_out,</text>
-  <text x="680" y="459" text-anchor="middle" class="small">CS_n=1, busy=0</text>
-  <path d="M902 350 V495 H475 V350" class="arrow"/>
-  <text x="690" y="523" text-anchor="middle" class="small">start_tx durante TRANSFER é ignorado; não há fila.</text>
+  <rect width="1180" height="640" fill="#fff"/>
+  <text x="590" y="48" text-anchor="middle" class="title">FSM Moore · SPI Master modo 3</text>
+
+  <rect x="55" y="180" width="225" height="150" rx="20" class="state"/>
+  <text x="167" y="218" text-anchor="middle" class="label">IDLE</text>
+  <text x="167" y="250" text-anchor="middle" class="small">SCLK=1 · CS_n=1</text>
+  <text x="167" y="276" text-anchor="middle" class="small">busy=0</text>
+  <text x="167" y="306" text-anchor="middle" class="small">Aguarda start_tx</text>
+
+  <rect x="350" y="180" width="225" height="150" rx="20" class="state"/>
+  <text x="462" y="218" text-anchor="middle" class="label">PREPARE</text>
+  <text x="462" y="250" text-anchor="middle" class="small">SCLK=1 · CS_n=0</text>
+  <text x="462" y="276" text-anchor="middle" class="small">busy=1</text>
+  <text x="462" y="306" text-anchor="middle" class="small">Prepara MOSI[7]</text>
+
+  <rect x="645" y="180" width="225" height="150" rx="20" class="state"/>
+  <text x="757" y="218" text-anchor="middle" class="label">SCLK_FALL</text>
+  <text x="757" y="250" text-anchor="middle" class="small">SCLK=0 · CS_n=0</text>
+  <text x="757" y="276" text-anchor="middle" class="small">busy=1</text>
+  <text x="757" y="306" text-anchor="middle" class="small">Apresenta bit TX</text>
+
+  <rect x="940" y="180" width="225" height="150" rx="20" class="state"/>
+  <text x="1052" y="218" text-anchor="middle" class="label">SCLK_RISE</text>
+  <text x="1052" y="250" text-anchor="middle" class="small">SCLK=1 · CS_n=0</text>
+  <text x="1052" y="276" text-anchor="middle" class="small">busy=1</text>
+  <text x="1052" y="306" text-anchor="middle" class="small">Próximo bit TX</text>
+
+  <path d="M280 215 H350" class="arrow"/>
+  <text x="315" y="197" text-anchor="middle" class="small">start_tx</text>
+  <path d="M575 255 H645" class="arrow"/>
+  <text x="610" y="237" text-anchor="middle" class="small">sempre</text>
+  <path d="M870 255 H940" class="arrow"/>
+  <text x="905" y="237" text-anchor="middle" class="small">amostra MISO</text>
+
+  <path d="M1052 330 V415 H757 V330" class="arrow"/>
+  <text x="905" y="398" text-anchor="middle" class="small">bit_count &lt; 7 / desloca TX, incrementa contador</text>
+  <path d="M757 330 V490 H167 V330" class="arrow"/>
+  <text x="470" y="473" text-anchor="middle" class="small">bit_count = 7 / amostra último MISO; publica data_out</text>
+
+  <rect x="265" y="525" width="650" height="75" rx="12" class="note"/>
+  <text x="590" y="555" text-anchor="middle" class="small">p_next_state_outputs decodifica SCLK, CS_n e busy pelo estado atual.</text>
+  <text x="590" y="580" text-anchor="middle" class="small">MOSI e data_out vêm dos registradores do datapath.</text>
 </svg>

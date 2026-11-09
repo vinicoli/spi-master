@@ -32,6 +32,29 @@ begin
             data_out => data_out
         );
 
+    sclk_clock_relation : process
+        variable previous_sclk : std_logic := '1';
+        variable previous_cs_n : std_logic := '1';
+    begin
+        loop
+            wait until rising_edge(clk);
+            wait for 1 ns;
+
+            if reset_n = '0' then
+                previous_sclk := sclk;
+                previous_cs_n := cs_n;
+            else
+                if previous_cs_n = '0' then
+                    assert sclk /= previous_sclk
+                        report "SCLK must toggle on every reference-clock edge during a transfer"
+                        severity failure;
+                end if;
+                previous_sclk := sclk;
+                previous_cs_n := cs_n;
+            end if;
+        end loop;
+    end process sclk_clock_relation;
+
     stimulus : process
         variable tx_byte : std_logic_vector(7 downto 0);
         variable rx_byte : std_logic_vector(7 downto 0);
@@ -58,13 +81,23 @@ begin
         assert cs_n = '0' and sclk = '1'
             report "CS must assert while SCLK remains at its mode-3 idle level" severity failure;
 
+        wait until falling_edge(sclk);
+        miso <= rx_byte(7);
+        wait for 1 ns;
+        assert mosi = tx_byte(7)
+            report "Transaction 1 transmitted an incorrect MSB" severity failure;
+
+        -- A request on the following half-cycle is ignored while busy.
         wait until falling_edge(clk);
         data_in <= x"FF";
         start_tx <= '1';
         wait until rising_edge(clk);
         start_tx <= '0';
+        wait for 1 ns;
+        assert busy = '1' and cs_n = '0' and data_out = x"00"
+            report "The busy request must be ignored without ending the active transfer" severity failure;
 
-        for bit_index in 7 downto 0 loop
+        for bit_index in 6 downto 0 loop
             wait until falling_edge(sclk);
             miso <= rx_byte(bit_index);
             wait for 1 ns;
