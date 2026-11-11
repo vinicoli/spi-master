@@ -17,9 +17,9 @@ entity spi_master is
 end entity spi_master;
 
 architecture rtl of spi_master is
-    type state_t is (IDLE, PREPARE, SCLK_FALL, SCLK_RISE);
+    type state_type is (IDLE, PREPARE, SCLK_FALL, SCLK_RISE);
 
-    signal state         : state_t := IDLE;
+    signal state         : state_type := IDLE;
     signal tx_shift      : std_logic_vector(7 downto 0) := (others => '0');
     signal rx_shift      : std_logic_vector(7 downto 0) := (others => '0');
     signal data_out_reg  : std_logic_vector(7 downto 0) := (others => '0');
@@ -91,11 +91,6 @@ begin
 
     p_output_logic : process (state)
     begin
-        -- Safe Moore defaults are the IDLE output levels.
-        sclk_control <= '1';
-        cs_n_control <= '1';
-        busy_control <= '0';
-
         case state is
             when IDLE =>
                 sclk_control <= '1'; -- CPOL=1: SCLK rests high in mode 3.
@@ -103,6 +98,7 @@ begin
                 busy_control <= '0';
 
             when PREPARE =>
+                sclk_control <= '1';
                 cs_n_control <= '0';
                 busy_control <= '1';
 
@@ -112,6 +108,7 @@ begin
                 busy_control <= '1';
 
             when SCLK_RISE =>
+                sclk_control <= '1';
                 cs_n_control <= '0';
                 busy_control <= '1';
 
