@@ -5,6 +5,8 @@ entity tb_spi_master is
 end entity tb_spi_master;
 
 architecture sim of tb_spi_master is
+    constant CLK_PERIOD : time := 20 ns;
+
     signal clk      : std_logic := '0';
     signal reset_n  : std_logic := '0';
     signal start_tx : std_logic := '0';
@@ -16,7 +18,7 @@ architecture sim of tb_spi_master is
     signal busy     : std_logic;
     signal data_out : std_logic_vector(7 downto 0);
 begin
-    clk <= not clk after 5 ns;
+    clk <= not clk after CLK_PERIOD / 2;
 
     dut : entity work.spi_master(rtl)
         port map (
@@ -61,7 +63,7 @@ begin
     begin
         -- Asynchronous reset and mode-3 idle levels.
         reset_n <= '0';
-        wait for 20 ns;
+        wait for 2 * CLK_PERIOD;
         assert busy = '0' and cs_n = '1' and sclk = '1'
             report "Reset must leave busy low, CS inactive, and SCLK high" severity failure;
         assert data_out = x"00"
@@ -179,7 +181,7 @@ begin
         assert data_out = x"00"
             report "Asynchronous reset must clear data_out" severity failure;
 
-        wait for 10 ns;
+        wait for CLK_PERIOD;
         reset_n <= '1';
         wait until rising_edge(clk);
         assert busy = '0' and cs_n = '1' and sclk = '1'
